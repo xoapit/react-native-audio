@@ -97,8 +97,9 @@ RCT_EXPORT_MODULE();
     
     // This will resume the music/audio file that was playing before the recording started
     // Without this piece of code, the music/audio will just be stopped
+    // NOTE: Don't stop audio session, keep this instance, it will be released by react-native-webrtc when stop it.
     NSError *error;
-    [[AVAudioSession sharedInstance] setActive:NO
+    [[AVAudioSession sharedInstance] setActive:YES
                                    withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
                                          error:&error];
     if (error) {
@@ -212,12 +213,13 @@ RCT_EXPORT_METHOD(prepareRecordingAtPath:(NSString *)path sampleRate:(float)samp
 
   _recordSession = [AVAudioSession sharedInstance];
 
-  if (_measurementMode) {
-      [_recordSession setCategory:AVAudioSessionCategoryRecord error:nil];
-      [_recordSession setMode:AVAudioSessionModeMeasurement error:nil];
-  }else{
-      [_recordSession setCategory:AVAudioSessionCategoryMultiRoute error:nil];
-  }
+  // NOTE: Don't change mode to work output device (bluetooth speaker). Make it works for react-native-webrtc
+  // if (_measurementMode) {
+  //     [_recordSession setCategory:AVAudioSessionCategoryRecord error:nil];
+  //     [_recordSession setMode:AVAudioSessionModeMeasurement error:nil];
+  // }else{
+  //     [_recordSession setCategory:AVAudioSessionCategoryMultiRoute error:nil];
+  // }
 
   _audioRecorder = [[AVAudioRecorder alloc]
                 initWithURL:_audioFileURL
@@ -245,7 +247,8 @@ RCT_EXPORT_METHOD(startRecording)
 RCT_EXPORT_METHOD(stopRecording)
 {
   [_audioRecorder stop];
-  [_recordSession setCategory:AVAudioSessionCategoryPlayback error:nil];
+  // NOTE: Don't change mode to work output device (bluetooth speaker). Make it works for react-native-webrtc
+  // [_recordSession setCategory:AVAudioSessionCategoryPlayback error:nil];
   _prevProgressUpdateTime = nil;
 }
 
