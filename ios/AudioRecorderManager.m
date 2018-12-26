@@ -235,6 +235,10 @@ RCT_EXPORT_METHOD(prepareRecordingAtPath:(NSString *)path sampleRate:(float)samp
     } else {
       [_audioRecorder prepareToRecord];
   }
+
+  // set volume default to speaker
+  UInt32 doChangeDefaultRoute = 1;
+  AudioSessionSetProperty(kAudioSessionProperty_OverrideCategoryDefaultToSpeaker, sizeof(doChangeDefaultRoute), &doChangeDefaultRoute);
 }
 
 RCT_EXPORT_METHOD(startRecording)
